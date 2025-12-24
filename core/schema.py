@@ -27,6 +27,15 @@ class TaskCommentType(DjangoObjectType):
         model = TaskComment
         fields = "__all__"
 
+
+class ProjectStatsType(graphene.ObjectType):
+    total_tasks = graphene.Int()
+    completed_tasks = graphene.Int()
+    in_progress_tasks = graphene.Int()
+    todo_tasks = graphene.Int()
+    completion_rate = graphene.Float()
+
+
 # queries
 class CoreQuery(graphene.ObjectType):
     organizations = graphene.List(OrganizationType)
@@ -46,6 +55,11 @@ class CoreQuery(graphene.ObjectType):
         task_id=graphene.ID(required=True)
     )
 
+    project_stats = graphene.Field(
+        ProjectStatsType,
+        project_id=graphene.ID(required=True)
+    )
+
 # resolvers
 
     def resolve_organizations(self, info):
@@ -59,6 +73,22 @@ class CoreQuery(graphene.ObjectType):
 
     def resolve_comments(self, info, task_id):
         return TaskComment.objects.filter(task_id=task_id)
+
+    def resolve_project_stats(self, info, project_id):
+        tasks = Task.objects.filter(project_id=project_id)
+        total_tasks = tasks.count()
+        completed_tasks = tasks.filter(status="DONE").count()
+        in_progress_tasks = tasks.filter(status="IN_PROGRESS").count()
+        todo_tasks = tasks.filter(status="TODO").count()
+        completion_rate = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
+
+        return ProjectStatsType(
+            total_tasks=total_tasks,
+            completed_tasks=completed_tasks,
+            in_progress_tasks=in_progress_tasks,
+            todo_tasks=todo_tasks,
+            completion_rate=completion_rate
+        )
 
 # Project Mutations
 
@@ -134,7 +164,155 @@ class DeleteProject(graphene.Mutation):
         return DeleteProject(success=True)
 
 
+# Task mutations
+
+class CreateTask(graphene.Mutation):
+    class Arguments:
+        project_id = graphene.ID(required=True)
+        title = graphene.String(required=True)
+        description = graphene.String(required=False)
+        status = graphene.String(required=False)
+        assignee_email = graphene.String(required=False)
+        due_date = graphene.String(required=False)
+
+    task = graphene.Field(TaskType)
+
+    def mutate(
+        self,
+        info,
+        project_id,
+        title,
+        description=None,
+        status="TODO",
+        assignee_email=None,
+        due_date=None
+    ):
+        try:
+            project = Project.objects.get(id=project_id)
+        except Project.DoesNotExist:
+            raise Exception("Project not found")
+
+        task = Task.objects.create(
+            project=project,
+            title=title,
+            description=description or "",
+            status=status,
+            assignee_email=assignee_email or "",
+            due_date=due_date if due_date else None
+        )
+
+        return CreateTask(task=task)
+    
+
+
+class UpdateTask(graphene.Mutation):
+    class Arguments:
+        task_id = graphene.ID(required=True)
+        title = graphene.String(required=False)
+        description = graphene.String(required=False)
+        status = graphene.String(required=False)
+        assignee_email = graphene.String(required=False)
+        due_date = graphene.String(required=False)
+
+    task = graphene.Field(TaskType)
+
+    def mutate(
+        self,
+        info,
+        task_id,
+        title=None,
+        description=None,
+        status=None,
+        assignee_email=None,
+        due_date=None
+    ):
+        try:
+            task = Task.objects.get(id=task_id)
+        except Task.DoesNotExist:
+            raise Exception("Task not found")
+
+        if title is not None:
+            task.title = title
+        if description is not None:
+            task.description = description
+        if status is not None:
+            task.status = status
+        if assignee_email is not None:
+            task.assignee_email = assignee_email
+        if due_date is not None:
+            task.due_date = due_date
+
+        task.save()
+        return UpdateTask(task=task)
+    
+
+class DeleteTask(graphene.Mutation):
+    class Arguments:
+        task_id = graphene.ID(required=True)
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, task_id):
+        try:
+            task = Task.objects.get(id=task_id)
+        except Task.DoesNotExist:
+            raise Exception("Task not found")
+
+        task.delete()
+        return DeleteTask(success=True)
+
+
+
+# Task Comments
+
+class AddTaskComment(graphene.Mutation):
+    class Arguments:
+        task_id = graphene.ID(required=True)
+        content = graphene.String(required=True)
+        author_email = graphene.String(required=True)
+
+    comment = graphene.Field(TaskCommentType)
+
+    def mutate(self, info, task_id, content, author_email):
+        try:
+            task = Task.objects.get(id=task_id)
+        except Task.DoesNotExist:
+            raise Exception("Task not found")
+
+        comment = TaskComment.objects.create(
+            task=task,
+            content=content,
+            author_email=author_email
+        )
+
+        return AddTaskComment(comment=comment)
+
+
+
+class DeleteTaskComment(graphene.Mutation):
+    class Arguments:
+        comment_id = graphene.ID(required=True)
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, comment_id):
+        try:
+            comment = TaskComment.objects.get(id=comment_id)
+        except TaskComment.DoesNotExist:
+            raise Exception("Comment not found")
+
+        comment.delete()
+        return DeleteTaskComment(success=True)
+
+
+
 class CoreMutation(graphene.ObjectType):
     create_project = CreateProject.Field()
     update_project = UpdateProject.Field()
     delete_project = DeleteProject.Field()
+    create_task = CreateTask.Field()
+    update_task = UpdateTask.Field()
+    delete_task = DeleteTask.Field()
+    add_task_comment = AddTaskComment.Field()
+    delete_task_comment = DeleteTaskComment.Field()
+
