@@ -1,6 +1,6 @@
 # Mini Project Management System
 
-This is a practical multi-tenant project management system built to demonstrate real-world backend and frontend engineering.  
+This is a multi-tenant project management system built to demonstrate real-world backend and frontend engineering.  
 
 ---
 
