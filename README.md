@@ -1,4 +1,4 @@
-## 🔧 Tech Stack
+## Tech Stack
 
 ### Backend
 - Django
@@ -16,9 +16,9 @@
 
 ---
 
-## 🖥️ Run Locally (Without Docker)
+##  Run Locally (Without Docker)
 
-### 1️⃣ Clone Project
+### 1 Clone Project
 ```
 git clone <repo-url>
 cd pms
@@ -84,17 +84,17 @@ http://localhost:5173
 
 ---
 
-# 🐳 Run Using Docker
+#  Run Using Docker
 
 You can also run the entire system using Docker so you don’t have to install Python, Node, or PostgreSQL manually.
 
-### 1️⃣ Clone the Repo
+###  Clone the Repo
 ```
 git clone <repo-url>
 cd pms
 ```
 
-### 2️⃣ Start Services
+###  Start Services
 Make sure Docker Desktop / Docker Engine is running, then:
 ```
 docker compose up --build -d
@@ -105,14 +105,14 @@ This will:
 ✔ Start Backend on **http://localhost:8001**  
 ✔ Start Frontend on **http://localhost:5173**  
 
-### 3️⃣ To Stop
+###  To Stop
 ```
 docker compose down
 ```
 ---
 
-## 📬 Issues?
+##  Issues?
 If anything breaks while starting Docker or local setup, mail with a screenshot:
-📧 sahilnayak2056@gmail.com
+sahilnayak2056@gmail.com
 
 ---
