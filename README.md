@@ -1,17 +1,11 @@
-# Mini Project Management System
-
-This is a multi-tenant project management system built to demonstrate real-world backend and frontend engineering.  
-
----
-
-## 1. Tech Stack
+## 🔧 Tech Stack
 
 ### Backend
 - Django
 - GraphQL (Graphene)
 - PostgreSQL
 - Django Admin
-- CORS handled
+- CORS Enabled
 
 ### Frontend
 - React
@@ -22,9 +16,9 @@ This is a multi-tenant project management system built to demonstrate real-world
 
 ---
 
-## 2. Local Setup Guide
+## 🖥️ Run Locally (Without Docker)
 
-### Clone Repository
+### 1️⃣ Clone Project
 ```
 git clone <repo-url>
 cd pms
@@ -46,7 +40,7 @@ Create PostgreSQL database:
 CREATE DATABASE pms_db;
 ```
 
-Create `.env` in backend:
+Create `.env` inside backend:
 ```
 DB_NAME=pms_db
 DB_USER=postgres
@@ -60,17 +54,17 @@ Run migrations:
 python manage.py migrate
 ```
 
-Create admin user:
+Create admin:
 ```
 python manage.py createsuperuser
 ```
 
-Run backend:
+Run server (Note: project uses port **8001**):
 ```
 python manage.py runserver 8001
 ```
 
-GraphQL Endpoint:
+GraphQL:
 http://localhost:8001/graphql
 
 Admin Panel:
@@ -85,119 +79,40 @@ npm install
 npm run dev
 ```
 
-Open in browser:
+Open:
 http://localhost:5173
 
 ---
 
-## 3. Folder Structure and Features Together
+# 🐳 Run Using Docker
 
+You can also run the entire system using Docker so you don’t have to install Python, Node, or PostgreSQL manually.
+
+### 1️⃣ Clone the Repo
+```
+git clone <repo-url>
+cd pms
+```
+
+### 2️⃣ Start Services
+Make sure Docker Desktop / Docker Engine is running, then:
+```
+docker compose up --build -d
+```
+This will:
+✔ Start PostgreSQL  
+✔ Run Django migrations  
+✔ Start Backend on **http://localhost:8001**  
+✔ Start Frontend on **http://localhost:5173**  
+
+### 3️⃣ To Stop
+```
+docker compose down
+```
 ---
 
-## Backend
-```
-backend/
-```
-This is responsible for business logic, database, and GraphQL API.
-
-### Models (Database Layer)
-Location:
-```
-backend/core/models.py
-```
-Contains:
-- Organization
-- Project
-- Task
-- TaskComment
-
-Data flow:
-Organization → Projects  
-Project → Tasks  
-Task → Comments  
-
-Multi-tenancy is handled using `organization.slug`.
+## 📬 Issues?
+If anything breaks while starting Docker or local setup, mail with a screenshot:
+📧 sahilnayak2056@gmail.com
 
 ---
-
-### GraphQL (API Layer)
-Location:
-```
-backend/core/schema.py
-```
-
-Provides:
-
-#### Queries
-- List organizations
-- List projects by organization
-- List tasks by project
-- List comments by task
-
-#### Mutations
-- Create / update / delete project
-- Create / update / delete task
-- Add / delete task comments
-
-#### Project Statistics
-For each project, backend calculates:
-- total tasks
-- completed tasks
-- in-progress tasks
-- todo tasks
-- completion percentage
-
----
-
-## Frontend
-```
-frontend/
-```
-This handles everything the user interacts with.
-
----
-
-### Apollo Client
-```
-frontend/src/apollo/client.ts
-```
-Connects React app with Django GraphQL API.
-
----
-
-### GraphQL Queries and Mutations
-```
-frontend/src/graphql/
-```
-Defines how frontend talks to backend.
-
----
-
-### Pages
-```
-frontend/src/pages/
-```
-
-#### Projects Page
-- User enters organization slug
-- Projects are fetched dynamically
-- Displays project list
-
-#### Project Details Page
-- Shows project statistics
-- Displays tasks
-- Shows status
-- Shows comments
-
----
-
-## What the System Can Do
-
-- Supports multiple organizations safely
-- Handles project lifecycle
-- Allows task creation and updates
-- Supports commenting on tasks
-- Shows project progress clearly
-- Clean backend and frontend separation
-- Production-like folder structure
-- Simple but realistic system
