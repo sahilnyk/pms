@@ -36,7 +36,6 @@ export default function ProjectDetailsPage() {
                 </Link>
             </div>
 
-            {/* Stats */}
             {stats && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div className="p-3 bg-white border rounded shadow-sm">
@@ -61,11 +60,9 @@ export default function ProjectDetailsPage() {
                 </div>
             )}
 
-            {/* Tasks */}
             <div>
                 <h2 className="text-xl font-semibold mb-2">Tasks</h2>
 
-                {/* Create Task Form */}
                 <form
                     onSubmit={async (e) => {
                         e.preventDefault();
@@ -107,7 +104,6 @@ export default function ProjectDetailsPage() {
                     </button>
                 </form>
 
-                {/* Task List */}
                 {tasks.length === 0 && (
                     <p className="text-gray-500">No tasks yet</p>
                 )}
@@ -118,7 +114,6 @@ export default function ProjectDetailsPage() {
                             <div className="flex justify-between">
                                 <p className="font-medium">{task.title}</p>
 
-                                {/* Status Selector */}
                                 <select
                                     value={task.status}
                                     onChange={(e) =>
@@ -145,7 +140,6 @@ export default function ProjectDetailsPage() {
                                 Assigned: {task.assigneeEmail || "Unassigned"}
                             </p>
 
-                            {/* COMMENTS HERE */}
                             <TaskComments taskId={task.id} />
                         </div>
                     ))}
